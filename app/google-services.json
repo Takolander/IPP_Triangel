@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "270732286977",
+    "firebase_url": "https://triangel-d3ff5.firebaseio.com",
+    "project_id": "triangel-d3ff5",
+    "storage_bucket": "triangel-d3ff5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:270732286977:android:06f1216ab6d4da5d",
+        "android_client_info": {
+          "package_name": "triangel.ipp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "270732286977-1o5m44hs482e781a68hd07q2jkor07jp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "triangel.ipp",
+            "certificate_hash": "1475cef553b9866a795842844ae7fae7b05dc1d4"
+          }
+        },
+        {
+          "client_id": "270732286977-digj2nl94290sjh4o31mrt4p4hi5r1n3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD38KJ2cq8KOtTX4N7m03hzgTe8c70rmEw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "270732286977-digj2nl94290sjh4o31mrt4p4hi5r1n3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
