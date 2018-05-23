@@ -27,12 +27,15 @@ public class MainActivity extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference reference;
     public TextView textView;
+    public TextView textView2;
 
     private Button button;
     private TextView coordinates;
     private LocationManager locationManager;
     private LocationListener locationListener;
     public boolean permission;
+    double c_lat, c_long;
+    double i_lat, i_long;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,14 +43,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         textView = (TextView) findViewById(R.id.t_box);
+        textView2 = (TextView) findViewById(R.id.t_box2);
 
         database = FirebaseDatabase.getInstance();
         reference = database.getReference();
-        reference.child("1").addValueEventListener(new ValueEventListener() {
+        reference.child("Lat").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String temp = dataSnapshot.getValue(String.class);
-                textView.setText(temp);
+                i_lat = Double.parseDouble(temp);
+                //textView.setText(temp);
             }
 
             @Override
@@ -55,16 +60,36 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        reference.child("Long").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String temp = dataSnapshot.getValue(String.class);
+                i_long = Double.parseDouble(temp);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         permission = runtime_permissions();
 
         button = (Button) findViewById(R.id.getLocation);
         coordinates = (TextView) findViewById(R.id.locationView);
 
-        locationManager = (LocationManager)getSystemService(LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                coordinates.append("\n "+location.getLatitude()+ " " +location.getLongitude());
+                coordinates.append("\n " + location.getLatitude() + " " + location.getLongitude());
+                c_lat = location.getLatitude();
+                c_long = location.getLongitude();
+                calculateDistance();
+                double distance = calculateDistanceAlgorithm(c_lat, c_long, i_lat, i_long);
+                String textDistance = String.valueOf(distance);
+                textView2.setText(textDistance);
             }
 
             @Override
@@ -86,9 +111,9 @@ public class MainActivity extends AppCompatActivity {
         configureButton();
     }
 
-    private boolean runtime_permissions(){
-        if(Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+    private boolean runtime_permissions() {
+        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
             return true;
         }
@@ -98,22 +123,41 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == 100){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == 100) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 configureButton();
             }
             runtime_permissions();
         }
     }
 
-    private void configureButton(){
+    private void configureButton() {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //location manager
-                locationManager.requestLocationUpdates("gps", 5000, 0 ,locationListener);
+                locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
             }
         });
 
+    }
+
+    public void calculateDistance() {
+        float results[] = new float[10];
+        Location.distanceBetween(c_lat, c_long, i_lat, i_long, results);
+        float distance = results[0];
+        String text = Float.toString(distance);
+        textView.setText(text);
+    }
+
+    public double calculateDistanceAlgorithm(double initialLat, double initialLong, double finalLat, double finalLong){
+        double R = 63730;
+        double deltaLat = finalLat - initialLat;
+        double deltaLong = finalLong - initialLong;
+
+        double A = (Math.sin(deltaLat/2) * Math.sin(deltaLat/2)) + Math.cos(initialLat) * Math.cos(finalLat) * (Math.sin(deltaLong/2) * Math.sin(deltaLong/2));
+        double C = 2 * Math.atan2(Math.sqrt(A), Math.sqrt(1 - A));
+        double distance = R*C;
+
+        return distance;
     }
 }
