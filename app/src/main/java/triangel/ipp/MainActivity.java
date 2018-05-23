@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //location manager
                 locationManager.requestLocationUpdates("gps", 5000, 0 ,locationListener);
             }
         });
