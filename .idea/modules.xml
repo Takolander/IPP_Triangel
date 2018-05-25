@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Androidstudio.iml" filepath="$PROJECT_DIR$/Androidstudio.iml" />
+      <module fileurl="file://$PROJECT_DIR$/IPP_Triangel.iml" filepath="$PROJECT_DIR$/IPP_Triangel.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

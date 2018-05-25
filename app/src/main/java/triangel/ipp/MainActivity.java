@@ -1,5 +1,7 @@
 package triangel.ipp;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,11 +28,28 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseDatabase database;
     DatabaseReference reference;
-    public TextView textView;
-    public TextView textView2;
+    public Button button;
+    public TextView text;
+    public int times;
 
-    private Button button;
-    private TextView coordinates;
+
+    public void init(){
+        button=(Button)findViewById(R.id.button);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
+                String message = "Söker efter olyckor...";
+                text=(TextView) findViewById(R.id.text_box);
+                text.setText(message);
+
+            }
+        });
+
+    }
+
     private LocationManager locationManager;
     private LocationListener locationListener;
     public boolean permission;
@@ -41,9 +60,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        textView = (TextView) findViewById(R.id.t_box);
-        textView2 = (TextView) findViewById(R.id.t_box2);
+        init();
 
         database = FirebaseDatabase.getInstance();
         reference = database.getReference();
@@ -52,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String temp = dataSnapshot.getValue(String.class);
                 i_lat = Double.parseDouble(temp);
-                //textView.setText(temp);
             }
 
             @Override
@@ -76,20 +92,15 @@ public class MainActivity extends AppCompatActivity {
 
         permission = runtime_permissions();
 
-        button = (Button) findViewById(R.id.getLocation);
-        coordinates = (TextView) findViewById(R.id.locationView);
-
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                coordinates.append("\n " + location.getLatitude() + " " + location.getLongitude());
                 c_lat = location.getLatitude();
                 c_long = location.getLongitude();
-                calculateDistance();
+                String text =  calculateDistance();
                 double distance = calculateDistanceAlgorithm(c_lat, c_long, i_lat, i_long);
-                String textDistance = String.valueOf(distance);
-                textView2.setText(textDistance);
+                switch_view(text, distance);
             }
 
             @Override
@@ -108,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         };
-        configureButton();
+        init();
     }
 
     private boolean runtime_permissions() {
@@ -125,28 +136,18 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 100) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                configureButton();
+                init();
             }
             runtime_permissions();
         }
     }
 
-    private void configureButton() {
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
-            }
-        });
-
-    }
-
-    public void calculateDistance() {
+    public String calculateDistance() {
         float results[] = new float[10];
         Location.distanceBetween(c_lat, c_long, i_lat, i_long, results);
         float distance = results[0];
         String text = Float.toString(distance);
-        textView.setText(text);
+        return text;
     }
 
     public double calculateDistanceAlgorithm(double initialLat, double initialLong, double finalLat, double finalLong){
@@ -156,8 +157,40 @@ public class MainActivity extends AppCompatActivity {
 
         double A = (Math.sin(deltaLat/2) * Math.sin(deltaLat/2)) + Math.cos(initialLat) * Math.cos(finalLat) * (Math.sin(deltaLong/2) * Math.sin(deltaLong/2));
         double C = 2 * Math.atan2(Math.sqrt(A), Math.sqrt(1 - A));
-        double distance = R*C;
+        double distance2 = R*C;
 
-        return distance;
+        return distance2;
+    }
+
+    public void switch_view(String distance, double distance2)
+    {
+        double distance3 = Double.parseDouble(distance);
+        if ((distance3+distance2/2) < 1000 && times < 1)
+        {
+            times++;
+
+            Intent toy = new Intent(MainActivity.this,Main2Activity.class);
+
+            recreateActivityCompat(MainActivity.this);
+
+            startActivity(toy);
+        }
+    }
+
+    public static final void recreateActivityCompat(final Activity a)
+    {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+        {
+            a.recreate();
+        }
+        else
+        {
+                final Intent intent = a.getIntent();
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                a.finish();
+                a.overridePendingTransition(0, 0);
+                a.startActivity(intent);
+                a.overridePendingTransition(0,0);
+        }
     }
 }
