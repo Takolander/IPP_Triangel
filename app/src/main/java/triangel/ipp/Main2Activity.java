@@ -3,6 +3,7 @@ package triangel.ipp;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -13,13 +14,15 @@ import com.google.firebase.database.ValueEventListener;
 
 public class Main2Activity extends AppCompatActivity {
 
+    //Deklarerar alla variabler som behövs i denna view.
     FirebaseDatabase database;
     DatabaseReference reference;
-    public TextView titel;
-    public TextView speed;
-    public TextView info;
-    public TextView klass;
+    public TextView Title;
+    public TextView Speed;
+    public TextView Information;
+    public TextView Class;
 
+    //Main
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,13 +30,14 @@ public class Main2Activity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
         reference = database.getReference();
-        reference.child("Titel").addValueEventListener(new ValueEventListener() {
+
+        //Likadana eventlisteners som finns på start skärmen. Dessa har till uppgift att hämta information om olyckan.
+        reference.child("Title").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                titel=(TextView) findViewById(R.id.text_titel);
-                String Titel_text = dataSnapshot.getValue(String.class);
-                titel.setText(Titel_text);
-
+                Title=(TextView) findViewById(R.id.text_Title);
+                String Title_text = dataSnapshot.getValue(String.class);
+                Title.setText(Title_text);
             }
 
             @Override
@@ -42,13 +46,12 @@ public class Main2Activity extends AppCompatActivity {
             }
         });
 
-        reference.child("Hastighet").addValueEventListener(new ValueEventListener() {
+        reference.child("Speed").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                speed=(TextView) findViewById(R.id.text_hastighet);
-                String Hastighet = dataSnapshot.getValue(String.class);
-                speed.setText(Hastighet);
-
+                Speed=(TextView) findViewById(R.id.text_Speed);
+                String Speed_text = dataSnapshot.getValue(String.class);
+                Speed.setText(Speed_text);
             }
 
             @Override
@@ -57,13 +60,12 @@ public class Main2Activity extends AppCompatActivity {
             }
         });
 
-        reference.child("Info").addValueEventListener(new ValueEventListener() {
+        reference.child("Information").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                info=(TextView) findViewById(R.id.text_info);
-                String information = dataSnapshot.getValue(String.class);
-                info.setText(information);
-
+                Information=(TextView) findViewById(R.id.text_Information);
+                String Information_text = dataSnapshot.getValue(String.class);
+                Information.setText(Information_text);
             }
 
             @Override
@@ -72,13 +74,12 @@ public class Main2Activity extends AppCompatActivity {
             }
         });
 
-        reference.child("Klass").addValueEventListener(new ValueEventListener() {
+        reference.child("Class").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                klass=(TextView) findViewById(R.id.text_klass);
-                String Klass = dataSnapshot.getValue(String.class);
-                klass.setText(Klass);
-
+                Class=(TextView) findViewById(R.id.text_Class);
+                String Class_text = dataSnapshot.getValue(String.class);
+                Class.setText(Class_text);
             }
 
             @Override
@@ -86,5 +87,22 @@ public class Main2Activity extends AppCompatActivity {
 
             }
         });
+
+        //Gör så att det dycker upp en tillbacka knapp uppe i vänstra hörnet så att det är lättare att förstå att man kan backa tillbacka.
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+    }
+
+    //Funktionen som sickar tillbacka dig till startsidan om du trycker på tillbacka knappen.
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+         int id = item.getItemId();
+
+         if (id == android.R.id.home)
+         {
+             this.finish();
+         }
+         return super.onOptionsItemSelected(item);
     }
 }
